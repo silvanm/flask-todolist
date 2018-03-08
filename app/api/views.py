@@ -6,6 +6,11 @@ from app.api import api
 from app.models import User, Todo, TodoList
 from app.decorators import admin_required
 
+@api.route('/filldb')
+def filldb():
+    from utils.fake_generator import FakeGenerator
+    FakeGenerator().start()  # side effect: deletes existing data
+    return jsonify({ 'success' : True })
 
 @api.route('/')
 def get_routes():

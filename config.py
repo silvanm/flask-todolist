@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
-
+import json
 import os
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
 
 def create_sqlite_uri(db_name):
-    return 'sqlite:///' + os.path.join(BASEDIR, db_name)
+    if 'VCAP_SERVICES' in os.environ:
+        vcap_services = json.loads(os.environ['VCAP_SERVICES'])
+        return vcap_services['mariadbent'][0]['credentials']['database_uri'].replace('?reconnect=true', '')
+    else:
+        return f'mysql://root:coffy@localhost/{db_name}'
 
 
 class Config(object):
@@ -22,12 +26,12 @@ class Config(object):
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = create_sqlite_uri('todolist-dev.db')
+    SQLALCHEMY_DATABASE_URI = create_sqlite_uri('todolist-dev')
 
 
 class TestingConfig(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = create_sqlite_uri('todolist-test.db')
+    SQLALCHEMY_DATABASE_URI = create_sqlite_uri('todolist-test')
     WTF_CSRF_ENABLED = False
     import logging
     logging.basicConfig(

@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
+import os
 
 from app import create_app
 
 app = create_app('development')
+
+
 
 
 @app.cli.command()
@@ -24,3 +27,8 @@ def fill_db():
     """
     from utils.fake_generator import FakeGenerator
     FakeGenerator().start()  # side effect: deletes existing data
+
+port = int(os.getenv('PORT', '5000'))
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=port)
